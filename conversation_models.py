@@ -5,6 +5,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from .models import ClientAction
 
 CONTRACT_VERSION = "1.0"
 
@@ -72,6 +73,10 @@ class ConversationResponse(BaseModel):
     summary: str | None = None
     next_actions: list[str] = Field(default_factory=list)
     planning: PlanningPayload | None = None
+    actions: list[ClientAction] = Field(
+        default_factory=list,
+        description="Client-executable actions produced by deep thinking",
+    )
 
 
 class InternalConversationResponse(BaseModel):

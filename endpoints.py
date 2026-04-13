@@ -121,6 +121,20 @@ class JarvisCoreEndpoints:
         path="/internal/chat/memory",
         internal=True,
     )
+    INTERNAL_DEEPTHINK_PLAN = EndpointSpec(
+        service="jarvis-core",
+        name="internal_deepthink_plan",
+        method="POST",
+        path="/internal/deepthink/plan",
+        internal=True,
+    )
+    INTERNAL_DEEPTHINK_EXECUTE = EndpointSpec(
+        service="jarvis-core",
+        name="internal_deepthink_execute",
+        method="POST",
+        path="/internal/deepthink/execute",
+        internal=True,
+    )
 
     @classmethod
     def all(cls) -> tuple[EndpointSpec, ...]:
@@ -140,6 +154,8 @@ class JarvisCoreEndpoints:
             cls.INTERNAL_CHAT_PERSONA_SELECT,
             cls.INTERNAL_CHAT_MEMORY,
             cls.INTERNAL_CHAT_MEMORY_LIST,
+            cls.INTERNAL_DEEPTHINK_PLAN,
+            cls.INTERNAL_DEEPTHINK_EXECUTE,
         )
 
     @classmethod
