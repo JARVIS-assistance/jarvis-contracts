@@ -4,8 +4,7 @@ from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, Field
 
-
-CONTRACT_VERSION = "1.0"
+from .action_registry import CONTRACT_VERSION, ClientActionType
 
 
 class PlanStep(BaseModel):
@@ -71,24 +70,9 @@ class ClientAction(BaseModel):
     물리 제어(마우스, 키보드, 화면 캡처)를 수행한다.
     """
 
-    type: Literal[
-        # ── 논리 작업 ──
-        "terminal",        # 터미널/쉘 명령 실행
-        "app_control",     # 앱 실행/종료/포커스
-        "file_write",      # 파일 쓰기/생성
-        "file_read",       # 파일 읽기
-        "open_url",        # URL/파일을 OS 기본 앱으로 열기
-        "browser_control", # 사용자 브라우저/웹뷰 조작
-        "web_search",      # 웹 검색 수행
-        "notify",          # 사용자 알림
-        "clipboard",       # 클립보드 복사
-        # ── 물리 제어 ──
-        "mouse_click",     # 지정 좌표 클릭
-        "mouse_drag",      # 드래그 앤 드롭
-        "keyboard_type",   # 텍스트 타이핑 (현재 활성 창)
-        "hotkey",          # 단축키 입력 (예: ctrl+c, alt+tab)
-        "screenshot",      # 스크린샷 촬영 요청 (화면 분석용)
-    ] = Field(..., description="Action type the client should execute")
+    type: ClientActionType = Field(
+        ..., description="Canonical action type the client should execute"
+    )
     command: Optional[str] = Field(
         default=None,
         description="Shell command, app command, hotkey combo (e.g. 'ctrl,c'), or search query",
@@ -111,7 +95,11 @@ class ClientAction(BaseModel):
             "  keyboard_type: {enter: true/false}\n"
             "  hotkey: {keys: 'ctrl,a'}\n"
             "  screenshot: {region: [x,y,w,h] or null for full screen}\n"
-            "  web_search: {max_results: 3}"
+            "  web_search: {max_results: 3}\n"
+            "  calendar_control: {provider, calendar_id, title, start, end, timezone, location, notes}\n"
+            "  browser_control/extract_dom: {purpose, query, include_links, include_elements, max_links}\n"
+            "  browser_control/click_element: {ai_id}\n"
+            "  browser_control/type_element: {ai_id, enter}"
         ),
     )
     description: str = Field(

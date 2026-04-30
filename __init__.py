@@ -1,3 +1,14 @@
+from .action_registry import (
+    ACTION_INTENT_ACTION_TYPES,
+    ACTION_REGISTRY,
+    ACTION_TYPE_ALIASES,
+    COMMANDS_BY_ACTION_TYPE,
+    CONTRACT_VERSION,
+    ClientActionType,
+    action_registry_payload,
+    format_action_registry_for_prompt,
+    normalize_action_payload,
+)
 from .conversation_models import (
     ConversationMode,
     ConversationRequest,
@@ -36,6 +47,7 @@ __all__ = [
     "ClientActionEnvelope",
     "ClientActionResult",
     "ClientActionResultRequest",
+    "ClientActionType",
     "ConversationMode",
     "ConversationRequest",
     "ConversationResponse",
@@ -62,4 +74,12 @@ __all__ = [
     "PrincipalResponse",
     "VerifyRequest",
     "VerifyResult",
+    "ACTION_INTENT_ACTION_TYPES",
+    "ACTION_REGISTRY",
+    "ACTION_TYPE_ALIASES",
+    "COMMANDS_BY_ACTION_TYPE",
+    "CONTRACT_VERSION",
+    "action_registry_payload",
+    "format_action_registry_for_prompt",
+    "normalize_action_payload",
 ]
