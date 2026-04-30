@@ -13,6 +13,9 @@ from .conversation_models import (
 from .endpoints import EndpointSpec, JarvisCoreEndpoints, JarvisGatewayEndpoints
 from .models import (
     ClientAction,
+    ClientActionEnvelope,
+    ClientActionResult,
+    ClientActionResultRequest,
     DeepThinkPlanRequest,
     DeepThinkPlanResponse,
     DeepThinkRequest,
@@ -30,6 +33,9 @@ from .models import (
 
 __all__ = [
     "ClientAction",
+    "ClientActionEnvelope",
+    "ClientActionResult",
+    "ClientActionResultRequest",
     "ConversationMode",
     "ConversationRequest",
     "ConversationResponse",

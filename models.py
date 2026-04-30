@@ -78,6 +78,7 @@ class ClientAction(BaseModel):
         "file_write",      # 파일 쓰기/생성
         "file_read",       # 파일 읽기
         "open_url",        # URL/파일을 OS 기본 앱으로 열기
+        "browser_control", # 사용자 브라우저/웹뷰 조작
         "web_search",      # 웹 검색 수행
         "notify",          # 사용자 알림
         "clipboard",       # 클립보드 복사
@@ -161,6 +162,10 @@ class DeepThinkRequest(BaseModel):
         default_factory=list,
         description="Planned steps — from AI planning or controller",
     )
+    execution_context: list[str] = Field(
+        default_factory=list,
+        description="Prior server/client execution results to inject into the step context",
+    )
 
 
 class DeepThinkStepResult(BaseModel):
@@ -184,3 +189,26 @@ class DeepThinkResponse(BaseModel):
         default_factory=list,
         description="Aggregated client actions from all steps, ready for execution",
     )
+
+
+class ClientActionEnvelope(BaseModel):
+    contract_version: str = Field(default=CONTRACT_VERSION)
+    action_id: str
+    request_id: str
+    action: ClientAction
+
+
+class ClientActionResultRequest(BaseModel):
+    contract_version: str = Field(default=CONTRACT_VERSION)
+    status: Literal["completed", "failed", "rejected", "timeout"]
+    output: dict[str, Any] = Field(default_factory=dict)
+    error: Optional[str] = None
+
+
+class ClientActionResult(BaseModel):
+    contract_version: str = Field(default=CONTRACT_VERSION)
+    action_id: str
+    request_id: str
+    status: Literal["queued", "completed", "failed", "rejected", "timeout"]
+    output: dict[str, Any] = Field(default_factory=dict)
+    error: Optional[str] = None
