@@ -65,6 +65,13 @@ class JarvisCoreEndpoints:
         path="/internal/chat/model-config/{model_config_id}",
         internal=True,
     )
+    INTERNAL_CHAT_MODEL_CONFIG_DELETE = EndpointSpec(
+        service="jarvis-core",
+        name="internal_chat_model_config_delete",
+        method="DELETE",
+        path="/internal/chat/model-config/{model_config_id}",
+        internal=True,
+    )
     INTERNAL_CHAT_MODEL_SELECTION = EndpointSpec(
         service="jarvis-core",
         name="internal_chat_model_selection",
@@ -121,6 +128,20 @@ class JarvisCoreEndpoints:
         path="/internal/chat/memory",
         internal=True,
     )
+    INTERNAL_CLIENT_RUNTIME_PROFILE = EndpointSpec(
+        service="jarvis-core",
+        name="internal_client_runtime_profile",
+        method="PUT",
+        path="/internal/client/runtime-profile",
+        internal=True,
+    )
+    INTERNAL_CLIENT_RUNTIME_PROFILE_GET = EndpointSpec(
+        service="jarvis-core",
+        name="internal_client_runtime_profile_get",
+        method="GET",
+        path="/internal/client/runtime-profile",
+        internal=True,
+    )
     INTERNAL_DEEPTHINK_PLAN = EndpointSpec(
         service="jarvis-core",
         name="internal_deepthink_plan",
@@ -154,6 +175,8 @@ class JarvisCoreEndpoints:
             cls.INTERNAL_CHAT_PERSONA_SELECT,
             cls.INTERNAL_CHAT_MEMORY,
             cls.INTERNAL_CHAT_MEMORY_LIST,
+            cls.INTERNAL_CLIENT_RUNTIME_PROFILE,
+            cls.INTERNAL_CLIENT_RUNTIME_PROFILE_GET,
             cls.INTERNAL_DEEPTHINK_PLAN,
             cls.INTERNAL_DEEPTHINK_EXECUTE,
         )

@@ -115,6 +115,51 @@ class ClientAction(BaseModel):
     )
 
 
+class ClientActionV2(BaseModel):
+    """ActionContract v2 action using capability-style names.
+
+    This is the compiler-facing contract. Controller validates this contract and
+    adapts it to the existing v1 ClientAction queue only after validation.
+    """
+
+    name: str = Field(
+        ...,
+        description="Capability action name, e.g. browser.search or app.open",
+    )
+    target: Optional[str] = Field(
+        default=None,
+        description="Concrete app, URL, element target, or runtime target.",
+    )
+    payload: Optional[str] = Field(
+        default=None,
+        description="Primary text payload such as typed text or command output.",
+    )
+    args: dict[str, Any] = Field(default_factory=dict)
+    description: str = Field(default="Client action")
+    requires_confirm: bool = False
+    step_id: Optional[str] = None
+
+
+class ClientActionPlan(BaseModel):
+    """Compiler output for a user turn."""
+
+    contract_version: str = Field(default=CONTRACT_VERSION)
+    mode: Literal["direct", "direct_sequence", "needs_plan", "no_action"] = "no_action"
+    goal: str | None = None
+    actions: list[ClientActionV2] = Field(default_factory=list)
+    confidence: float = Field(default=0.0, ge=0.0, le=1.0)
+    reason: str | None = None
+
+
+class ClientActionValidationIssue(BaseModel):
+    code: str
+    message: str
+    action_index: int | None = None
+    action_name: str | None = None
+    field: str | None = None
+    details: dict[str, Any] = Field(default_factory=dict)
+
+
 # ── DeepThink contracts ────────────────────────────────────
 
 
