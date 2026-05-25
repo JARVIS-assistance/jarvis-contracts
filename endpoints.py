@@ -128,6 +128,27 @@ class JarvisCoreEndpoints:
         path="/internal/chat/memory",
         internal=True,
     )
+    INTERNAL_AUDIO_SPEECH = EndpointSpec(
+        service="jarvis-core",
+        name="internal_audio_speech",
+        method="POST",
+        path="/internal/audio/speech",
+        internal=True,
+    )
+    INTERNAL_AUDIO_SPEECH_PCM = EndpointSpec(
+        service="jarvis-core",
+        name="internal_audio_speech_pcm",
+        method="POST",
+        path="/internal/audio/speech/pcm",
+        internal=True,
+    )
+    INTERNAL_AUDIO_SPEECH_MODELS = EndpointSpec(
+        service="jarvis-core",
+        name="internal_audio_speech_models",
+        method="GET",
+        path="/internal/audio/speech/models",
+        internal=True,
+    )
     INTERNAL_CLIENT_RUNTIME_PROFILE = EndpointSpec(
         service="jarvis-core",
         name="internal_client_runtime_profile",
@@ -140,6 +161,41 @@ class JarvisCoreEndpoints:
         name="internal_client_runtime_profile_get",
         method="GET",
         path="/internal/client/runtime-profile",
+        internal=True,
+    )
+    INTERNAL_TODOS = EndpointSpec(
+        service="jarvis-core",
+        name="internal_todos",
+        method="POST",
+        path="/internal/todos",
+        internal=True,
+    )
+    INTERNAL_TODOS_LIST = EndpointSpec(
+        service="jarvis-core",
+        name="internal_todos_list",
+        method="GET",
+        path="/internal/todos",
+        internal=True,
+    )
+    INTERNAL_TODO_DETAIL = EndpointSpec(
+        service="jarvis-core",
+        name="internal_todo_detail",
+        method="GET",
+        path="/internal/todos/{todo_id}",
+        internal=True,
+    )
+    INTERNAL_TODO_UPDATE = EndpointSpec(
+        service="jarvis-core",
+        name="internal_todo_update",
+        method="PATCH",
+        path="/internal/todos/{todo_id}",
+        internal=True,
+    )
+    INTERNAL_TODO_DELETE = EndpointSpec(
+        service="jarvis-core",
+        name="internal_todo_delete",
+        method="DELETE",
+        path="/internal/todos/{todo_id}",
         internal=True,
     )
     INTERNAL_DEEPTHINK_PLAN = EndpointSpec(
@@ -167,6 +223,7 @@ class JarvisCoreEndpoints:
             cls.INTERNAL_CHAT_MODEL_CONFIG,
             cls.INTERNAL_CHAT_MODEL_CONFIG_LIST,
             cls.INTERNAL_CHAT_MODEL_CONFIG_UPDATE,
+            cls.INTERNAL_CHAT_MODEL_CONFIG_DELETE,
             cls.INTERNAL_CHAT_MODEL_SELECTION,
             cls.INTERNAL_CHAT_MODEL_SELECTION_GET,
             cls.INTERNAL_CHAT_PERSONA,
@@ -175,8 +232,15 @@ class JarvisCoreEndpoints:
             cls.INTERNAL_CHAT_PERSONA_SELECT,
             cls.INTERNAL_CHAT_MEMORY,
             cls.INTERNAL_CHAT_MEMORY_LIST,
+            cls.INTERNAL_AUDIO_SPEECH,
+            cls.INTERNAL_AUDIO_SPEECH_PCM,
             cls.INTERNAL_CLIENT_RUNTIME_PROFILE,
             cls.INTERNAL_CLIENT_RUNTIME_PROFILE_GET,
+            cls.INTERNAL_TODOS,
+            cls.INTERNAL_TODOS_LIST,
+            cls.INTERNAL_TODO_DETAIL,
+            cls.INTERNAL_TODO_UPDATE,
+            cls.INTERNAL_TODO_DELETE,
             cls.INTERNAL_DEEPTHINK_PLAN,
             cls.INTERNAL_DEEPTHINK_EXECUTE,
         )

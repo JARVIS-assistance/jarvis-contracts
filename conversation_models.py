@@ -40,6 +40,12 @@ class ConversationRequest(BaseModel):
     recent_failures: int = 0
     ambiguity_count: int = 0
     turn_index: int = 0
+    tts_enabled: bool = False
+    tts_voice: str = Field(default="default", max_length=80)
+    tts_model: str | None = Field(default=None, max_length=4096)
+    tts_sample_rate: int = Field(default=24000, ge=8000, le=48000)
+    tts_channels: Literal[1, 2] = 1
+    tts_sample_width: Literal[2] = 2
 
 
 class InternalConversationRequest(BaseModel):

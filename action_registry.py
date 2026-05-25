@@ -15,6 +15,7 @@ ClientActionType: TypeAlias = Literal[
     "browser_control",
     "web_search",
     "calendar_control",
+    "todo",
     "notify",
     "clipboard",
     "mouse_click",
@@ -52,6 +53,10 @@ ClientActionV2Name: TypeAlias = Literal[
     "calendar.create",
     "calendar.update",
     "calendar.delete",
+    "todo.create",
+    "todo.list",
+    "todo.update",
+    "todo.delete",
 ]
 
 COMMANDS_BY_ACTION_TYPE: dict[str, tuple[str | None, ...]] = {
@@ -84,6 +89,7 @@ COMMANDS_BY_ACTION_TYPE: dict[str, tuple[str | None, ...]] = {
         "update_event",
         "delete_event",
     ),
+    "todo": ("create", "list", "update", "delete"),
     "notify": (None,),
     "clipboard": ("copy", "paste"),
     "mouse_click": (None,),
@@ -103,6 +109,7 @@ ACTION_TYPE_DESCRIPTIONS: dict[str, str] = {
     "browser_control": "Control the active browser tab or extract DOM candidates.",
     "web_search": "Server-side web search. Frontend must not convert this to a browser action.",
     "calendar_control": "Control the user's configured calendar app or provider.",
+    "todo": "Manage server-side todo items. Frontend must not execute this as a client action.",
     "notify": "Show a local notification.",
     "clipboard": "Copy to or paste from the clipboard.",
     "mouse_click": "Click at screen coordinates.",
@@ -128,6 +135,7 @@ ACTION_TYPE_ARGS: dict[str, str] = {
     ),
     "web_search": "{max_results}",
     "calendar_control": "{provider, calendar_id, title, start, end, timezone, location, notes}",
+    "todo": "{title?, todo_id?, description?, status?, due_at?, timezone?, calendar_provider?, calendar_id?, calendar_event_id?, metadata?}",
     "notify": "{level?}",
     "clipboard": "{}",
     "mouse_click": "{x, y, button, clicks}",
@@ -159,6 +167,7 @@ ACTION_INTENT_ACTION_TYPES: tuple[str, ...] = (
     "screenshot",
     "clipboard",
     "notify",
+    "todo",
 )
 
 ACTION_REGISTRY: dict[str, dict[str, Any]] = {
@@ -388,6 +397,38 @@ ACTION_V2_CAPABILITIES: dict[str, dict[str, Any]] = {
         "args": "{provider?, calendar_id?, event_id}",
         "requires_confirm": True,
         "v1": "calendar_control/delete_event",
+    },
+    "todo.create": {
+        "name": "todo.create",
+        "namespace": "todo",
+        "description": "Create a server-side todo item. This does not create or sync a calendar event.",
+        "args": "{title, description?, priority?, due_at?, remind_at?, timezone?, calendar_provider?, calendar_id?, calendar_event_id?, metadata?}",
+        "requires_confirm": False,
+        "v1": "todo/create",
+    },
+    "todo.list": {
+        "name": "todo.list",
+        "namespace": "todo",
+        "description": "List server-side todo items for the current user.",
+        "args": "{status?, include_deleted?, limit?}",
+        "requires_confirm": False,
+        "v1": "todo/list",
+    },
+    "todo.update": {
+        "name": "todo.update",
+        "namespace": "todo",
+        "description": "Update a server-side todo item. Calendar fields are references only.",
+        "args": "{todo_id, title?, description?, status?, priority?, due_at?, remind_at?, timezone?, calendar_provider?, calendar_id?, calendar_event_id?, calendar_sync_status?, metadata?}",
+        "requires_confirm": False,
+        "v1": "todo/update",
+    },
+    "todo.delete": {
+        "name": "todo.delete",
+        "namespace": "todo",
+        "description": "Soft-delete a server-side todo item.",
+        "args": "{todo_id}",
+        "requires_confirm": False,
+        "v1": "todo/delete",
     },
 }
 

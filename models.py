@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from datetime import datetime
 from typing import Any, Literal, Optional
 
 from pydantic import BaseModel, Field
@@ -158,6 +159,69 @@ class ClientActionValidationIssue(BaseModel):
     action_name: str | None = None
     field: str | None = None
     details: dict[str, Any] = Field(default_factory=dict)
+
+
+# ── Todo contracts ─────────────────────────────────────────
+
+
+TodoStatus = Literal["open", "completed", "cancelled", "archived"]
+CalendarSyncStatus = Literal["none", "linked", "pending", "synced", "failed"]
+
+
+class TodoCreateRequest(BaseModel):
+    title: str = Field(..., min_length=1, max_length=200)
+    description: str | None = None
+    priority: int = Field(default=3, ge=1, le=5)
+    due_at: datetime | None = None
+    remind_at: datetime | None = None
+    timezone: str | None = Field(default=None, max_length=64)
+    calendar_provider: str | None = Field(default=None, max_length=80)
+    calendar_id: str | None = Field(default=None, max_length=200)
+    calendar_event_id: str | None = Field(default=None, max_length=200)
+    chat_id: str | None = None
+    source_message_id: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class TodoUpdateRequest(BaseModel):
+    title: str | None = Field(default=None, min_length=1, max_length=200)
+    description: str | None = None
+    status: TodoStatus | None = None
+    priority: int | None = Field(default=None, ge=1, le=5)
+    due_at: datetime | None = None
+    remind_at: datetime | None = None
+    timezone: str | None = Field(default=None, max_length=64)
+    calendar_provider: str | None = Field(default=None, max_length=80)
+    calendar_id: str | None = Field(default=None, max_length=200)
+    calendar_event_id: str | None = Field(default=None, max_length=200)
+    calendar_sync_status: CalendarSyncStatus | None = None
+    metadata: dict[str, Any] | None = None
+
+
+class TodoResponse(BaseModel):
+    id: str
+    user_id: str
+    title: str
+    description: str | None = None
+    status: TodoStatus
+    priority: int
+    due_at: datetime | None = None
+    remind_at: datetime | None = None
+    timezone: str | None = None
+    calendar_provider: str | None = None
+    calendar_id: str | None = None
+    calendar_event_id: str | None = None
+    calendar_sync_status: CalendarSyncStatus
+    chat_id: str | None = None
+    source_message_id: str | None = None
+    metadata: dict[str, Any] = Field(default_factory=dict)
+    created_at: datetime
+    updated_at: datetime
+    completed_at: datetime | None = None
+
+
+class TodoListResponse(BaseModel):
+    items: list[TodoResponse] = Field(default_factory=list)
 
 
 # ── DeepThink contracts ────────────────────────────────────
