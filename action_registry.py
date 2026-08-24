@@ -20,9 +20,12 @@ ClientActionType: TypeAlias = Literal[
     "clipboard",
     "mouse_click",
     "mouse_drag",
+    "mouse_move",
+    "mouse_scroll",
     "keyboard_type",
     "hotkey",
     "screenshot",
+    "screen_stream",
 ]
 
 ClientActionV2Name: TypeAlias = Literal[
@@ -43,7 +46,10 @@ ClientActionV2Name: TypeAlias = Literal[
     "keyboard.hotkey",
     "mouse.click",
     "mouse.drag",
+    "mouse.move",
+    "mouse.scroll",
     "screen.screenshot",
+    "screen.stream",
     "clipboard.copy",
     "clipboard.paste",
     "terminal.run",
@@ -94,9 +100,12 @@ COMMANDS_BY_ACTION_TYPE: dict[str, tuple[str | None, ...]] = {
     "clipboard": ("copy", "paste"),
     "mouse_click": (None,),
     "mouse_drag": (None,),
+    "mouse_move": (None,),
+    "mouse_scroll": (None,),
     "keyboard_type": (None,),
     "hotkey": (None,),
     "screenshot": (None,),
+    "screen_stream": ("start", "stop", "describe"),
 }
 
 ACTION_TYPE_DESCRIPTIONS: dict[str, str] = {
@@ -114,9 +123,16 @@ ACTION_TYPE_DESCRIPTIONS: dict[str, str] = {
     "clipboard": "Copy to or paste from the clipboard.",
     "mouse_click": "Click at screen coordinates.",
     "mouse_drag": "Drag between screen coordinates.",
+    "mouse_move": "Move the cursor to screen coordinates without clicking.",
+    "mouse_scroll": "Scroll the mouse wheel at the current or given coordinates.",
     "keyboard_type": "Type text into the active focused window.",
-    "hotkey": "Press a keyboard shortcut.",
+    "hotkey": "Press a keyboard shortcut, optionally held for a duration.",
     "screenshot": "Capture the screen for visual analysis.",
+    "screen_stream": (
+        "Start/stop periodic screen-capture frame streaming to the backend, or "
+        "describe the latest streamed frame with a local vision model "
+        "(server-executed, no client round-trip)."
+    ),
 }
 
 ACTION_TYPE_ARGS: dict[str, str] = {
@@ -139,10 +155,13 @@ ACTION_TYPE_ARGS: dict[str, str] = {
     "notify": "{level?}",
     "clipboard": "{}",
     "mouse_click": "{x, y, button, clicks}",
-    "mouse_drag": "{start_x, start_y, end_x, end_y}",
+    "mouse_drag": "{start_x, start_y, end_x, end_y, button?}",
+    "mouse_move": "{x, y, duration_seconds?}",
+    "mouse_scroll": "{amount, direction, x?, y?}",
     "keyboard_type": "{enter}",
-    "hotkey": "{keys}",
+    "hotkey": "{keys, duration_seconds?}",
     "screenshot": "{region}",
+    "screen_stream": "start:{fps?, quality?, max_width?}; stop:{}; describe:{prompt?}",
 }
 
 ACTION_TYPE_ALIASES: dict[str, str] = {
@@ -164,7 +183,10 @@ ACTION_INTENT_ACTION_TYPES: tuple[str, ...] = (
     "hotkey",
     "mouse_click",
     "mouse_drag",
+    "mouse_move",
+    "mouse_scroll",
     "screenshot",
+    "screen_stream",
     "clipboard",
     "notify",
     "todo",
@@ -297,8 +319,8 @@ ACTION_V2_CAPABILITIES: dict[str, dict[str, Any]] = {
     "keyboard.hotkey": {
         "name": "keyboard.hotkey",
         "namespace": "keyboard",
-        "description": "Press a keyboard shortcut.",
-        "args": "{keys}",
+        "description": "Press a keyboard shortcut, optionally holding it for duration_seconds (e.g. holding a movement key in a game).",
+        "args": "{keys, duration_seconds?}",
         "requires_confirm": False,
         "v1": "hotkey",
     },
@@ -314,9 +336,25 @@ ACTION_V2_CAPABILITIES: dict[str, dict[str, Any]] = {
         "name": "mouse.drag",
         "namespace": "mouse",
         "description": "Drag between screen coordinates.",
-        "args": "{start_x, start_y, end_x, end_y}",
+        "args": "{start_x, start_y, end_x, end_y, button?}",
         "requires_confirm": True,
         "v1": "mouse_drag",
+    },
+    "mouse.move": {
+        "name": "mouse.move",
+        "namespace": "mouse",
+        "description": "Move the cursor to screen coordinates without clicking.",
+        "args": "{x, y, duration_seconds?}",
+        "requires_confirm": False,
+        "v1": "mouse_move",
+    },
+    "mouse.scroll": {
+        "name": "mouse.scroll",
+        "namespace": "mouse",
+        "description": "Scroll the mouse wheel at the current or given coordinates.",
+        "args": "{amount, direction, x?, y?}",
+        "requires_confirm": False,
+        "v1": "mouse_scroll",
     },
     "screen.screenshot": {
         "name": "screen.screenshot",
@@ -325,6 +363,37 @@ ACTION_V2_CAPABILITIES: dict[str, dict[str, Any]] = {
         "args": "{region?}",
         "requires_confirm": False,
         "v1": "screenshot",
+    },
+    "screen.stream_start": {
+        "name": "screen.stream_start",
+        "namespace": "screen",
+        "description": (
+            "Start periodic screen-capture frame streaming to the backend "
+            "for near-real-time visual feedback."
+        ),
+        "args": "{fps?, quality?, max_width?}",
+        "requires_confirm": False,
+        "v1": "screen_stream/start",
+    },
+    "screen.stream_stop": {
+        "name": "screen.stream_stop",
+        "namespace": "screen",
+        "description": "Stop screen-capture frame streaming.",
+        "args": "{}",
+        "requires_confirm": False,
+        "v1": "screen_stream/stop",
+    },
+    "screen.describe": {
+        "name": "screen.describe",
+        "namespace": "screen",
+        "description": (
+            "Describe the latest streamed screen frame with a local vision "
+            "model. Requires screen_stream/start to have run first; executed "
+            "entirely server-side, no client round-trip."
+        ),
+        "args": "{prompt?}",
+        "requires_confirm": False,
+        "v1": "screen_stream/describe",
     },
     "clipboard.copy": {
         "name": "clipboard.copy",
@@ -529,6 +598,9 @@ def normalize_action_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
             "end_y",
             "keys",
             "region",
+            "amount",
+            "direction",
+            "duration_seconds",
         ),
     )
 
@@ -588,6 +660,14 @@ def normalize_action_payload(payload: Mapping[str, Any]) -> dict[str, Any]:
         _copy_number_arg(data["args"], "y", aliases=("y_coordinate",))
 
     if action_type == "mouse_drag":
+        data["command"] = None
+
+    if action_type == "mouse_move":
+        data["command"] = None
+        _copy_number_arg(data["args"], "x", aliases=("x_coordinate",))
+        _copy_number_arg(data["args"], "y", aliases=("y_coordinate",))
+
+    if action_type == "mouse_scroll":
         data["command"] = None
 
     return data

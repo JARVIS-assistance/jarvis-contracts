@@ -149,6 +149,13 @@ class JarvisCoreEndpoints:
         path="/internal/audio/speech/models",
         internal=True,
     )
+    INTERNAL_VISION_DESCRIBE = EndpointSpec(
+        service="jarvis-core",
+        name="internal_vision_describe",
+        method="POST",
+        path="/internal/vision/describe",
+        internal=True,
+    )
     INTERNAL_CLIENT_RUNTIME_PROFILE = EndpointSpec(
         service="jarvis-core",
         name="internal_client_runtime_profile",
@@ -234,6 +241,7 @@ class JarvisCoreEndpoints:
             cls.INTERNAL_CHAT_MEMORY_LIST,
             cls.INTERNAL_AUDIO_SPEECH,
             cls.INTERNAL_AUDIO_SPEECH_PCM,
+            cls.INTERNAL_VISION_DESCRIBE,
             cls.INTERNAL_CLIENT_RUNTIME_PROFILE,
             cls.INTERNAL_CLIENT_RUNTIME_PROFILE_GET,
             cls.INTERNAL_TODOS,
